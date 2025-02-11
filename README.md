@@ -1,6 +1,4 @@
-# [LA CTF](https://lac.tf/)
-
-`the-eye` was a reverse challenge from the 2025 edition of the [LA CTF](https://lac.tf/) :
+# the-eye
 
 ```
 rev/the-eye
@@ -22,7 +20,7 @@ $ echo "1234" > msg.txt && ./the-eye
 3421
 ```
 
-The program needs a `msg.txt` file to execute, and is shuffle it's content before printing it out. Let's try connecting to the servers :
+The program needs a `msg.txt` file to execute, and shuffles it's content before printing it out. Let's try connecting to the server :
 
 ```console
 $ nc chall.lac.tf 31313
@@ -80,13 +78,13 @@ void shuffle(char *message)
 
 `shuffle()` swaps the last byte from `message` with another random one determined using `rand()`. It's repeating this operation on every byte of the `message`, from the last byte to the first one.
 
-Once this encoding done 22 times as said previously, the `main` function prints out the encoded `message` : `puts(message);`.
+Once this encoding done 22 times as mentionned earlier, the `main` function prints out the encoded `message` : `puts(message);`.
 
 Since the whole operation is using a pseudo-random generator with a known seed, we could replicate this randomness, and decode the message by inverting this algorithm.
 
 ## Scripting
 
-Fist things first, let's break the randomness :
+First things first, let's break the randomness :
 
 ```python3
 from ctypes import CDLL
@@ -160,7 +158,7 @@ gef➤  p $rax
 $3 = 0x1a174d95
 ```
 
-Let's see if we get same outputs in Python with the same seed :
+Let's see if we get the same outputs in Python with the same seed :
 
 ```python
 from ctypes import CDLL
@@ -180,7 +178,7 @@ $ python3 solve.py
 
 This is working, we can predict the output of every `rand()`.
 
-Now we need to invert `shuffle()` by swapping back every byte to their right place one by one starting with the last pair of bytes that was swapped. That's why we first need to determine the output of every `rand()` call. `rand()` being called once for every byte of `message` in `shuffle()` and `shuffle()` being called 22 times, `rand()` is called `len(message)*22`. Let's calculate every output of `rand()` : 
+Now we need to invert `shuffle()` by swapping back every byte to their right place one by one starting with the last pair of bytes that was swapped. That's why we first need to determine the output of every `rand()` call. `rand()` being called once for every byte of `message` in `shuffle()` and `shuffle()` being called 22 times, `rand()` is called `len(message)*22` in total. Let's calculate every output of `rand()` : 
 
 ```python
 from pwn import *
@@ -273,7 +271,7 @@ Decoded : Testing this script
 
 ## Exploit
 
-Using this [final script](/solve.py) connecting back to the servers and decoding the message we get :
+Using this [final script](/solve.py) to connect back to the servers and decode the message we get :
 
 ```console
 $ python3 solve.py
