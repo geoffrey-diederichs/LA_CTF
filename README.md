@@ -1,6 +1,18 @@
 # [LA CTF](https://lac.tf/)
 
-`the-eye` was a reverse challenge from the 2025 edition of the [LA CTF](https://lac.tf/). We were given a [Dockerfile](/Dockerfile) and an [executable](/the-eye) :
+`the-eye` was a reverse challenge from the 2025 edition of the [LA CTF](https://lac.tf/) :
+
+```
+rev/the-eye
+
+Author : aplet123
+
+I believe we’ve reached the end of our journey. All that remains is to collapse the innumerable possibilities before us.
+
+nc chall.lac.tf 31313
+```
+
+We were given a [Dockerfile](/Dockerfile) and an [executable](/the-eye) :
 
 ```console
 $ ./the-eye 
@@ -10,7 +22,7 @@ $ echo "1234" > msg.txt && ./the-eye
 3421
 ```
 
-The program needs a `msg.txt` file to execute, and it seems to shuffle it's content before printing it out. Let's try connecting to the servers :
+The program needs a `msg.txt` file to execute, and is shuffle it's content before printing it out. Let's try connecting to the servers :
 
 ```console
 $ nc chall.lac.tf 31313
@@ -168,7 +180,7 @@ $ python3 solve.py
 
 This is working, we can predict the output of every `rand()`.
 
-Now we need to invert `shuffle()` by swapping back every byte to their right place one by one starting with the last pair of bytes that was swapped. That's why we first need to determine the output of every `rand()` call. `rand()` being called once for every byte of `message` in `shuffle()`, and `shuffle()` being called 22 times : 
+Now we need to invert `shuffle()` by swapping back every byte to their right place one by one starting with the last pair of bytes that was swapped. That's why we first need to determine the output of every `rand()` call. `rand()` being called once for every byte of `message` in `shuffle()` and `shuffle()` being called 22 times, `rand()` is called `len(message)*22`. Let's calculate every output of `rand()` : 
 
 ```python
 from pwn import *
@@ -188,16 +200,18 @@ if __name__ == "__main__":
     libc.srand(curr_time)
     
     message = p.recv()
-    message = data.split(b"\n")[0]
-    message = list(data.decode())
+    message = message.split(b"\n")[0]
+    message = list(message.decode())
 
-    rands = calc_rand(len(message), 22, libc)
-    print(rands)
+    rands = calc_rands(len(message), 22, libc)
+    print(len(rands), rands[-1])
 ```
 
-In this script I used `pwntools` to run the program, then used `CDLL` at the same time as the program to break it's randomness, then saving every `rand()` output used by the program in `rands` :
+In this script I used `pwntools` to run `the-eye`, then used `CDLL` at the same time as the program to break it's randomness, then saved every `rand()` output used by the program in `rands` :
 
 ```console
+$ echo "Testing this script" > msg.txt
+
 $ python3 solve.py
 [+] Starting local process './the-eye': pid 20734
 [*] Process './the-eye' stopped with exit code 0 (pid 20734)
@@ -259,7 +273,7 @@ Decoded : Testing this script
 
 ## Exploit
 
-Using this [final script](/solve.py) connecting back to the servers and decoded the message we get :
+Using this [final script](/solve.py) connecting back to the servers and decoding the message we get :
 
 ```console
 $ python3 solve.py
