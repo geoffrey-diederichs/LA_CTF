@@ -10,7 +10,7 @@ I believe we’ve reached the end of our journey. All that remains is to collaps
 nc chall.lac.tf 31313
 ```
 
-We were given a [Dockerfile](/Dockerfile) and an [executable](/the-eye) :
+We were given a [Dockerfile](https://github.com/geoffrey-diederichs/LA_CTF_2025/blob/main/Dockerfile) and an [executable](https://github.com/geoffrey-diederichs/LA_CTF_2025/blob/main/the-eye) :
 
 ```console
 $ ./the-eye 
@@ -52,7 +52,7 @@ undefined8 main(void)
 
 The `main()` function is using the current time as a seed for the `rand` function : `srand((uint)curr_time);`.
 
-It is then getting the content of the `msg.txt` file using the `read_msg()` function, before calling in a loop 22 times `shuffle()` :
+It is then getting the content of the `msg.txt` file using the `read_msg()` function, before calling `shuffle()` 22 times :
 
 ```C
 void shuffle(char *message)
@@ -205,7 +205,7 @@ if __name__ == "__main__":
     print(len(rands), rands[-1])
 ```
 
-In this script I used `pwntools` to run `the-eye`, then used `CDLL` at the same time as the program to break it's randomness, then saved every `rand()` output used by the program in `rands` :
+In this script I used `pwntools` to run `the-eye`, then used `CDLL` to run `time()` at the same time as the program to break it's randomness, then saved every `rand()` output used by the program in `rands` :
 
 ```console
 $ echo "Testing this script" > msg.txt
@@ -271,7 +271,7 @@ Decoded : Testing this script
 
 ## Exploit
 
-Using this [final script](/solve.py) to connect back to the servers and decode the message we get :
+Using this [final script](https://github.com/geoffrey-diederichs/LA_CTF_2025/blob/main/solve.py) to connect back to the servers and decode the message we get :
 
 ```console
 $ python3 solve.py
